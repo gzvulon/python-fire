@@ -41,10 +41,6 @@ tasks:
         | xargs -I {} \
         task show-docker-part target={} \
         >> {{.target_dockerfile}}
-
-      - echo '#!/bin/bash' > '{{.target_defaultbuild}}'
-      - echo "$(cat docker.parts/autobuild.part.Dockerfile | grep @@@auto.build.sh | cut -d':' -f2)" >> '{{.target_defaultbuild}}'
-      - chmod +x '{{.target_defaultbuild}}'
       - cp tools/*.sh generated/
     sources:
       - 'docker_parts/*.part.Dockerfile'
@@ -61,10 +57,6 @@ tasks:
     desc: _
     deps:
       - gen-docker-file
-      - gen-build-sh
     cmds:
-      - bash '{{.target_autobuild}}'
-
-
-
-
+      # - pushd $(dirname '{{.target_defaultbuild}}'); bash $(basename '{{.target_defaultbuild}}'); popd
+      - cd generated && ls && ./default.build.sh
