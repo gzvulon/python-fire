@@ -19,7 +19,7 @@ tasks:
       - echo "{{.GREETING }}{{.DIMG}}"
     silent: true
 
-  docker:build:envdimg:
+  docker:build:
     desc: _
     cmds:
       - docker build -f test.Dockerfile -t '{{.DIMG}}' .
@@ -44,3 +44,27 @@ tasks:
     cmds:
       - task -d cicd -p pytest pyver=3.6 pytest pyver=2.7
       - echo passed in all
+
+  pytest2.7:
+    <<: *_pytest
+    vars: {pyver: 2.7}
+
+  pytest3.6:
+    <<: *_pytest
+    vars: {pyver: 3.6}
+
+  test:
+    <<: *_root_task
+    deps:
+      - pytest2.7
+      - pytest3.6
+    cmds:
+      - echo passed in all
+
+
+  ci-build:
+    <<: *_root_task
+    cmds:
+      - task -d cicd/gzvulon__base_docker rebuild
+      - task: docker:build
+      - task: test

@@ -61,3 +61,8 @@ tasks:
     cmds:
       # - pushd $(dirname '{{.target_defaultbuild}}'); bash $(basename '{{.target_defaultbuild}}'); popd
       - cd generated && ls && ./default.build.sh
+
+  rebuild:
+    desc: _
+    cmds:
+      - task: rebuild:dtask
