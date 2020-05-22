@@ -18,6 +18,7 @@ export SCRIPT_DIR=$(dirname $(realpath "$0" || readlink -f "$0"))
 export DIMG=$(cat "${SCRIPT_DIR}/dimg.txt")
 
 docker run \
+--user $(id -u):$(id -g) \
 -e PYVER=${PYVER:-py3.6} \
 ${ITTY} \
 --rm \
