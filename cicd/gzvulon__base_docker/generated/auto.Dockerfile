@@ -64,3 +64,30 @@ RUN conda install -y ipython
 # --- @@[kind=dockerfile.part][name=install-dtask][os=ubuntu][act=start]
 RUN curl -sL https://taskfile.dev/install.sh | sh && mv ./bin/task /usr/local/bin/
 # --- @@[kind=dockerfile.part][name=install-dtask][os=ubuntu][act=stop]
+# keep 4 lines
+
+# --- @@[kind=dockerfile.part][name=install-python23][os=ubuntu][act=start]
+# | xargs -P12 -I {} \
+
+# ENV PY_VERSIONS "2.7 3.4 3.5 3.6 3.7"
+ENV PY_VERSIONS "2.7 3.6"
+RUN echo ${PY_VERSIONS} \
+    | xargs -n 1 \
+    | xargs -I {} -P2 \
+    conda create -y --name py{} python={} && echo "OK"
+
+RUN conda init bash
+
+# --- @@[kind=dockerfile.part][name=install-python23][os=ubuntu][act=end]
+# keep 4 lines
+
+# --- @@[kind=dockerfile.part][name=default-build-cmd][os=ubuntu][act=start]
+# #!/bin/bash
+# @@@build# docker build -f auto.Dockerfile -t dtaskimg .
+# --- @@[kind=dockerfile.part][name=default-build-cmd][os=ubuntu][act=end]
+
+# --- @@[kind=dockerfile.part][name=set-entrypoint-pyenv-arg][os=ubuntu][act=start]
+COPY python_23_conda__env_arg.part.run.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+ENTRYPOINT [ "/entrypoint.sh" ]
+# --- @@[kind=dockerfile.part][name=set-entrypoint-pyenv-arg][os=ubuntu][act=end]

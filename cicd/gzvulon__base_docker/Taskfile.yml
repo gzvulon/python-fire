@@ -41,7 +41,8 @@ tasks:
         | xargs -I {} \
         task show-docker-part target={} \
         >> {{.target_dockerfile}}
-      - cp tools/*.sh generated/
+      - cp tools/* generated/
+      - cp docker.scripts/* generated/
     sources:
       - 'docker_parts/*.part.Dockerfile'
     generates:
