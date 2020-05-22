@@ -82,7 +82,7 @@ tasks:
     #   - task: _check
     #     vars: {cmd: ls gzvulon__base_docker}
     cmds:
-      - task -d cicd -p _check cmd='echo $(pwd)' _check cmd='docker ps' _check cmd='ls gzvulon__base_docker'
+      - task -d cicd -p _check cmd='echo $(pwd)' _check cmd='docker ps' _check cmd='ls cicd/gzvulon__base_docker'
 
   ci-flow:
     <<: *_root_task
