@@ -15,7 +15,9 @@ docker run \
 -v /opt:/opt:rw \
 --workdir $(pwd) \
 dtaskimg \
-bash -c "$@ ${TBG}"
+$@
+
+# bash -c "$@ ${TBG}"
 
 # -v /home/$USER:/home/$USER \
 # --user $(id -u):$(id -g) \

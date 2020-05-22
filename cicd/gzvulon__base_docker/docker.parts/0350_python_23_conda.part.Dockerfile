@@ -10,7 +10,7 @@ FROM ubuntu:18.04
 ENV PY_VERSIONS "2.7 3.6"
 RUN echo ${PY_VERSIONS} \
     | xargs -n 1 \
-    | xargs -I {} -P2 \
+    | xargs -I {} \
     conda create -y --name py{} python={} && echo "OK"
 
 # RUN conda init bash

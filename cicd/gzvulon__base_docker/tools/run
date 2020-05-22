@@ -9,6 +9,7 @@ if [[ "$1" == "--debug" ]]; then
 fi
 
 docker run \
+-e PYVER=${PYVER:-py3.6} \
 --rm \
 -v /var/run/docker.sock:/var/run/docker.sock \
 -v $(pwd):$(pwd):rw \

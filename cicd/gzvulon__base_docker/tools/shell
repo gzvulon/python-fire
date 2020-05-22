@@ -9,7 +9,7 @@ if [[ "$1" == "--debug" ]]; then
 fi
 
 docker run \
-$@ \
+-e PYVER=${PYVER:-py3.6} \
 -it \
 --rm \
 -v /var/run/docker.sock:/var/run/docker.sock \
@@ -17,7 +17,7 @@ $@ \
 -v /opt:/opt:rw \
 --workdir $(pwd) \
 dtaskimg \
-bash
+bash $@
 
 # -v /home/$USER:/home/$USER \
 # --user $(id -u):$(id -g) \

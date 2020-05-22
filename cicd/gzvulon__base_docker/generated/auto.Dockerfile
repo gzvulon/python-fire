@@ -1,10 +1,27 @@
 FROM ubuntu:18.04
 # keep 4 lines
 
-# --- @@[kind=dockerfile.part][name=default-build-cmd][os=ubuntu][act=start]
-# #!/bin/bash
-# @@@build# docker build -f auto.Dockerfile -t dtaskimg .
-# --- @@[kind=dockerfile.part][name=default-build-cmd][os=ubuntu][act=end]
+# --- @@[kind=dockerfile.part][name=setup-default-shell][os=ubuntu][act=start]
+SHELL [ "/bin/bash", "--login", "-c" ]
+# --- @@[kind=dockerfile.part][name=setup-default-shell][os=ubuntu][act=end]
+# keep 4 lines
+
+# --- @@[kind=dockerfile.part][name=Create a non-root user][os=ubuntu][act=start]
+# Create a non-root user
+ARG username=pyconda
+ARG uid=1000
+ARG gid=100
+ENV USER $username
+ENV UID $uid
+ENV GID $gid
+ENV HOME /home/$USER
+RUN adduser --disabled-password \
+    --gecos "Non-root user" \
+    --uid $UID \
+    --gid $GID \
+    --home $HOME \
+    $USER
+# --- @@[kind=dockerfile.part][name=Create a non-root user][os=ubuntu][act=end]
 # keep 4 lines
 
 # --- @@[kind=dockerfile.part][name=install-docker-client][os=ubuntu][act=start]
@@ -18,7 +35,11 @@ RUN add-apt-repository \
    stable"
 RUN apt-get update  -qq \
     && apt-get install docker-ce -y
+
 RUN usermod -aG docker root
+# use non-rootuser
+RUN usermod -aG docker $USER
+
 RUN apt-get clean
 RUN curl -L "https://github.com/docker/compose/releases/download/1.24.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose && chmod +x /usr/local/bin/docker-compose
 # --- @@[kind=dockerfile.part][name=install-docker-client][os=ubuntu][act=stop]
@@ -32,37 +53,41 @@ RUN apt-get update -y \
  && apt-get install -y apt-utils git curl ca-certificates bzip2 cmake tree htop bmon iotop g++ \
  && apt-get install -y libglib2.0-0 libsm6 libxext6 libxrender-dev
 
-ENV PATH="/root/miniconda3/bin:${PATH}"
-ARG PATH="/root/miniconda3/bin:${PATH}"
 RUN apt-get update
 
 RUN apt-get install -y wget && rm -rf /var/lib/apt/lists/*
 
-RUN wget \
+USER $USER
+# install miniconda
+# ENV MINICONDA_VERSION 4.8.2
+ENV CONDA_DIR $HOME/miniconda3
+
+RUN cd /tmp && wget \
     https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
-    && mkdir /root/.conda \
-    && bash Miniconda3-latest-Linux-x86_64.sh -b \
+    && bash Miniconda3-latest-Linux-x86_64.sh -b -p $CONDA_DIR \
     && rm -f Miniconda3-latest-Linux-x86_64.sh
+
+# RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-$MINICONDA_VERSION-Linux-x86_64.sh -O ~/miniconda.sh && \
+#     chmod +x ~/miniconda.sh && \
+#     ~/miniconda.sh -b -p $CONDA_DIR && \
+#     rm ~/miniconda.sh
+
+# make non-activate conda commands available
+ENV PATH=$CONDA_DIR/bin:$PATH
 RUN conda --version
 
-# Create a Python 3.6 environment
-RUN conda install -y conda-build \
- && conda create -y --name py36 python=3.6.10 \
- && conda clean -ya
-
-# ENV CONDA_DEFAULT_ENV=py36
-# ENV CONDA_PREFIX=/miniconda/envs/$CONDA_DEFAULT_ENV
-# ENV PATH=$CONDA_PREFIX/bin:$PATH
-# ENV CONDA_AUTO_UPDATE_CONDA=false
-
-RUN conda install -y ipython
-
+# make conda activate command available from /bin/bash --login shells
+RUN echo ". $CONDA_DIR/etc/profile.d/conda.sh" >> ~/.profile
+# make conda activate command available from /bin/bash --interative shells
+RUN conda init bash
 # --- @@[kind=dockerfile.part][name=install-miniconda][os=ubuntu][act=stop]
 
 # keep 4 lines
 
 # --- @@[kind=dockerfile.part][name=install-dtask][os=ubuntu][act=start]
+USER root
 RUN curl -sL https://taskfile.dev/install.sh | sh && mv ./bin/task /usr/local/bin/
+USER $USER
 # --- @@[kind=dockerfile.part][name=install-dtask][os=ubuntu][act=stop]
 # keep 4 lines
 
@@ -73,10 +98,10 @@ RUN curl -sL https://taskfile.dev/install.sh | sh && mv ./bin/task /usr/local/bi
 ENV PY_VERSIONS "2.7 3.6"
 RUN echo ${PY_VERSIONS} \
     | xargs -n 1 \
-    | xargs -I {} -P2 \
+    | xargs -I {} \
     conda create -y --name py{} python={} && echo "OK"
 
-RUN conda init bash
+# RUN conda init bash
 
 # --- @@[kind=dockerfile.part][name=install-python23][os=ubuntu][act=end]
 # keep 4 lines
@@ -87,7 +112,14 @@ RUN conda init bash
 # --- @@[kind=dockerfile.part][name=default-build-cmd][os=ubuntu][act=end]
 
 # --- @@[kind=dockerfile.part][name=set-entrypoint-pyenv-arg][os=ubuntu][act=start]
+USER root
 COPY python_23_conda__env_arg.part.run.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
+USER $USER
+RUN echo USER=$USER
 ENTRYPOINT [ "/entrypoint.sh" ]
+
+# default command will launch JupyterLab server for development
+CMD [ "jupyter", "lab", "--no-browser", "--ip", "0.0.0.0" ]
+
 # --- @@[kind=dockerfile.part][name=set-entrypoint-pyenv-arg][os=ubuntu][act=end]

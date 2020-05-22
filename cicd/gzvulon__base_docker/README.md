@@ -6,6 +6,9 @@ as docker-compose was warppen onec
 
 ## Wrapper
 
+Heavily based on [Conda Docker](https://towardsdatascience.com/conda-pip-and-docker-ftw-d64fe638dc45) Article
+
+
 ## Tricks
 
 ### Running docker build from stdin
