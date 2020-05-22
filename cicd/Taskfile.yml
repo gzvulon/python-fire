@@ -74,13 +74,13 @@ tasks:
 
   checks:
     <<: *_root_task
-    deps:
-      - task: _check
-        vars: {cmd: echo $(pwd)}
-      - task: _check
-        vars: {cmd: docker ps}
-      - task: _check
-        vars: {cmd: ls gzvulon__base_docker}
+    # deps:
+    #   - task: _check
+    #     vars: {cmd: echo $(pwd)}
+    #   - task: _check
+    #     vars: {cmd: docker ps}
+    #   - task: _check
+    #     vars: {cmd: ls gzvulon__base_docker}
     cmds:
       - task -p _check cmd='echo $(pwd)' _check cmd='docker ps' _check cmd='ls gzvulon__base_docker'
 
