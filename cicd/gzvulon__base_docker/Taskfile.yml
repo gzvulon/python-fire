@@ -43,7 +43,7 @@ tasks:
         >> {{.target_dockerfile}}
 
       - echo '#!/bin/bash' > '{{.target_defaultbuild}}'
-      - echo '$(cat auto.Dockerfile | grep @@@build | cut -d"#" -f3)' >> '{{.target_defaultbuild}}'
+      - echo "$(cat docker.parts/autobuild.part.Dockerfile | grep @@@auto.build.sh | cut -d':' -f2)" >> '{{.target_defaultbuild}}'
       - chmod +x '{{.target_defaultbuild}}'
     sources:
       - 'docker_parts/*.part.Dockerfile'
