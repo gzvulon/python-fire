@@ -67,6 +67,6 @@ tasks:
     cmds:
       - echo $(pwd)
       - ls cicd/gzvulon__base_docker
-      - task -d cicd/gzvulon__base_docker rebuild
+      - task -d gzvulon__base_docker rebuild
       - task: docker:build
       - task: test
