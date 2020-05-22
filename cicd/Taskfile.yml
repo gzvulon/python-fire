@@ -64,7 +64,7 @@ tasks:
   build:base:
     <<: *_root_task
     cmds:
-      - DOCKER_API_VERSION=1.38 task -d gzvulon__base_docker rebuild
+      - DOCKER_API_VERSION=1.38 task -d cicd/gzvulon__base_docker rebuild
 
   _check:
     <<: *_root_task
