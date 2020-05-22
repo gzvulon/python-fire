@@ -19,16 +19,35 @@ tasks:
       - echo "{{.GREETING }}{{.DIMG}}"
     silent: true
 
-  docker:build:
+  docker:build:env:
     desc: _
     cmds:
       - DOCKER_API_VERSION=1.38 docker build -f test.Dockerfile -t '{{.DIMG}}' .
+
+  docker:build:app:
+    desc: _
+    dir: ..
+    cmds:
+      - DOCKER_API_VERSION=1.38 docker build -f cicd/build.Dockerfile -t '{{.DIMG}}-build' .
+
+  docker:build:
+    desc: _
+    cmds:
+      - task: docker:build:env
+      - task: docker:build:app
+
 
   pytest: &_pytest
     <<: *_root_task
     cmds:
       - echo $(pwd)
       - PYVER='py{{.pyver}}' ./cicd/drun.sh python -u -m pytest
+
+  pytest2: &_pytest2
+    <<: *_root_task
+    cmds:
+      - echo $(pwd)
+      - PYVER='py{{.pyver}}' WDIR=/app DIMG='{{.DIMG}}-build' ./cicd/drun.sh python -u -m pytest
 
   docker:run:test:
     <<: *_root_task
@@ -43,15 +62,15 @@ tasks:
   drun:tests:
     <<: *_root_task
     cmds:
-      - task -d cicd -p pytest pyver=3.6 pytest pyver=2.7
+      - task -d cicd -p pytest2 pyver=3.6 pytest2 pyver=2.7
       - echo passed in all
 
   pytest2.7:
-    <<: *_pytest
+    <<: *_pytest2
     vars: {pyver: 2.7}
 
   pytest3.6:
-    <<: *_pytest
+    <<: *_pytest2
     vars: {pyver: 3.6}
 
   test:

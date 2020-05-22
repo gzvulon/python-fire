@@ -14,8 +14,12 @@ if [[ "$1" == "bash" ]]; then
     ITTY='-it'
 fi
 
-export SCRIPT_DIR=$(dirname $(realpath "$0" || readlink -f "$0"))
-export DIMG=$(cat "${SCRIPT_DIR}/dimg.txt")
+SCRIPT_DIR=$(dirname $(realpath "$0" || readlink -f "$0"))
+DEF_DIMG=$(cat "${SCRIPT_DIR}/dimg.txt")
+DIMG=${DIMG:-${DEF_DIMG}}
+
+DEF_WDIR=$(pwd)
+WDIR=${WDIR:-${DEF_WDIR}}
 
 docker run \
 --user $(id -u):$(id -g) \
@@ -25,7 +29,7 @@ ${ITTY} \
 -v /var/run/docker.sock:/var/run/docker.sock \
 -v $(pwd):$(pwd):rw \
 -v /opt:/opt:rw \
---workdir $(pwd) \
+--workdir ${WDIR} \
 ${DIMG} \
 $@
 
