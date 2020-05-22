@@ -1,6 +1,10 @@
 #!/bin/bash
 
 # echo "running with $@"
+if [[ "$1" == "--debug" ]]; then
+    TBG='cat /etc/os-release'
+    shift
+fi
 
 docker run \
 --rm \
@@ -9,7 +13,7 @@ docker run \
 -v /opt:/opt:rw \
 --workdir $(pwd) \
 dtaskimg \
-task $@
+bash -c "task $@; ${TBG}"
 
 # -v /home/$USER:/home/$USER \
 # --user $(id -u):$(id -g) \
