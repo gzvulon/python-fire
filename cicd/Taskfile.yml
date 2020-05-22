@@ -22,7 +22,7 @@ tasks:
   docker:build:
     desc: _
     cmds:
-      - docker build -f test.Dockerfile -t '{{.DIMG}}' .
+      - DOCKER_API_VERSION=1.38 docker build -f test.Dockerfile -t '{{.DIMG}}' .
 
   pytest: &_pytest
     <<: *_root_task
@@ -61,13 +61,26 @@ tasks:
     cmds:
       - echo passed in all
 
+  build:base:
+    <<: *_root_task
+    cmds:
+      - DOCKER_API_VERSION=1.38 task -d gzvulon__base_docker rebuild
+
+  checks:
+    <<: *_root_task
+    deps:
+      - echo $(pwd)
+      - docker ps
+      - ls gzvulon__base_docker
+    cmds:
+      - echo checks ok
 
   ci-flow:
     <<: *_root_task
+    envs:
+      DOCKER_API_VERSION: '1.38'
     cmds:
-      - DOCKER_API_VERSION=1.38 docker ps
-      - echo $(pwd)
-      - ls gzvulon__base_docker
-      - DOCKER_API_VERSION=1.38 task -d gzvulon__base_docker rebuild
-      - DOCKER_API_VERSION=1.38 task: docker:build
+      - task: checks
+      - task: build:base
+      - task: docker:build
       - task: test

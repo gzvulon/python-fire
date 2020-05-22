@@ -2,6 +2,8 @@
 
 #!/bin/bash
 
+DOCKER_API_VERSION=1.38
+
 # echo "running with $@"
 if [[ "$1" == "--debug" ]]; then
     TBG='; cat /etc/os-release'
