@@ -74,6 +74,10 @@ tasks:
 
   checks:
     <<: *_root_task
+    envs:
+      DOCKER_API_VERSION: '1.38'
+    env:
+      DOCKER_API_VERSION: '1.38'
     # deps:
     #   - task: _check
     #     vars: {cmd: echo $(pwd)}
