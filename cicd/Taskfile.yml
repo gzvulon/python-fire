@@ -64,12 +64,10 @@ tasks:
 
   ci-flow:
     <<: *_root_task
-    env:
-      DOCKER_API_VERSION: 1.38
     cmds:
-      - docker ps
+      - DOCKER_API_VERSION=1.38 docker ps
       - echo $(pwd)
       - ls gzvulon__base_docker
-      - task -d gzvulon__base_docker rebuild
-      - task: docker:build
+      - DOCKER_API_VERSION=1.38 task -d gzvulon__base_docker rebuild
+      - DOCKER_API_VERSION=1.38 task: docker:build
       - task: test
