@@ -1,6 +1,14 @@
 @Library("jenlib@master") _
 // ===== /SHARED PART ====
 
+//// approval for currentScriptPath
+// field org.jenkinsci.plugins.workflow.multibranch.SCMBinder scriptPath
+// method hudson.model.Run getParent
+// method java.io.File getParent
+// method org.jenkinsci.plugins.workflow.job.WorkflowJob getDefinition
+// method org.jenkinsci.plugins.workflow.support.steps.build.RunWrapper getRawBuild
+// new java.io.File java.lang.String
+
 // --- globas vars ---
 def jg = [
     scmvars: null,
