@@ -4,11 +4,15 @@ version: '2'
 
 vars:
   GREETING: Hello, World!
+  target_dockerfile: generated/auto.Dockerfile
+  target_autobuild: generated/auto.build.sh
+  target_defaultbuild: generated/default.build.sh
 
 tasks:
   default:
     cmds:
       - echo "{{.GREETING}}"
+      - task -l
     silent: true
 
   show-docker-part:
@@ -28,7 +32,6 @@ tasks:
   gen-docker-file:
     desc: _
     vars:
-      target_dockerfile: generated/auto.Dockerfile
       docker_parts:
         sh: ls -1 docker.parts/*.part.Dockerfile | sort
     cmds:
@@ -38,27 +41,34 @@ tasks:
         | xargs -I {} \
         task show-docker-part target={} \
         >> {{.target_dockerfile}}
+
+      - echo '#!/bin/bash' > '{{.target_defaultbuild}}'
+      - echo '$(cat auto.Dockerfile | grep @@@build | cut -d"#" -f3)' >> '{{.target_defaultbuild}}'
+      - chmod +x '{{.target_defaultbuild}}'
     sources:
-      - '*.part.Dockerfile'
+      - 'docker_parts/*.part.Dockerfile'
     generates:
-      - auto.Dockerfile
+      - "{{.target_dockerfile}}"
     method: checksum
 
   gen-build-sh:
     desc: _
     cmds:
-      - task build:dtask --dry >auto.build.sh  2>&1
-      - chmod +x auto.build.sh
+      - echo '#!/bin/bash' > '{{.target_autobuild}}'
+      - echo 'cd "$(dirname "$(realpath "$0" || readlink -f "$0")")"' >> '{{.target_autobuild}}'
+      - echo '#---' >> '{{.target_autobuild}}'
+      - task build:dtask --dry >> '{{.target_autobuild}}'  2>&1
+      - chmod +x '{{.target_autobuild}}'
     sources:
       - Taskfile.yml
     generates:
-      - auto.build.sh
+      - '{{.target_autobuild}}'
     method: checksum
 
   build:dtask:
     desc: _
     cmds:
-      - docker build -f auto.Dockerfile -t dtaskimg .
+      - docker build -f '{{.target_dockerfile}}' -t dtaskimg .
 
   rebuild:dtask:
     desc: _
@@ -66,7 +76,7 @@ tasks:
       - gen-docker-file
       - gen-build-sh
     cmds:
-      - bash auto.build.sh
+      - bash '{{.target_autobuild}}'
 
 
 
