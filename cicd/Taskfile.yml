@@ -66,12 +66,20 @@ tasks:
     cmds:
       - DOCKER_API_VERSION=1.38 task -d gzvulon__base_docker rebuild
 
+  _check:
+    <<: *_root_task
+    cmds:
+      - $(cmd)
+
   checks:
     <<: *_root_task
     deps:
-      - echo $(pwd)
-      - docker ps
-      - ls gzvulon__base_docker
+      - task: _check
+        vars: {cmd: echo $(pwd)}
+      - task: _check
+        vars: {cmd: docker ps}
+      - task: _check
+        vars: {cmd: ls gzvulon__base_docker}
     cmds:
       - echo checks ok
 
