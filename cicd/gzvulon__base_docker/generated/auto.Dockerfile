@@ -27,12 +27,6 @@ RUN curl -L "https://github.com/docker/compose/releases/download/1.24.0/docker-c
 
 # keep 4 lines
 
-# --- @@[kind=dockerfile.part][name=install-dtask][os=ubuntu][act=start]
-RUN curl -sL https://taskfile.dev/install.sh | sh && mv ./bin/task /usr/local/bin/
-# --- @@[kind=dockerfile.part][name=install-dtask][os=ubuntu][act=stop]
-
-# keep 4 lines
-
 # --- @@[kind=dockerfile.part][name=install-miniconda][os=ubuntu][act=start]
 # install basics
 RUN apt-get update -y \
@@ -65,3 +59,9 @@ RUN conda install -y conda-build \
 RUN conda install -y ipython
 
 # --- @@[kind=dockerfile.part][name=install-miniconda][os=ubuntu][act=stop]
+
+# keep 4 lines
+
+# --- @@[kind=dockerfile.part][name=install-dtask][os=ubuntu][act=start]
+RUN curl -sL https://taskfile.dev/install.sh | sh && mv ./bin/task /usr/local/bin/
+# --- @@[kind=dockerfile.part][name=install-dtask][os=ubuntu][act=stop]

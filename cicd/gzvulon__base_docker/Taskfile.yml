@@ -45,24 +45,11 @@ tasks:
       - echo '#!/bin/bash' > '{{.target_defaultbuild}}'
       - echo "$(cat docker.parts/autobuild.part.Dockerfile | grep @@@auto.build.sh | cut -d':' -f2)" >> '{{.target_defaultbuild}}'
       - chmod +x '{{.target_defaultbuild}}'
+      - cp tools/*.sh generated/
     sources:
       - 'docker_parts/*.part.Dockerfile'
     generates:
       - "{{.target_dockerfile}}"
-    method: checksum
-
-  gen-build-sh:
-    desc: _
-    cmds:
-      - echo '#!/bin/bash' > '{{.target_autobuild}}'
-      - echo 'cd "$(dirname "$(realpath "$0" || readlink -f "$0")")"' >> '{{.target_autobuild}}'
-      - echo '#---' >> '{{.target_autobuild}}'
-      - task build:dtask --dry >> '{{.target_autobuild}}'  2>&1
-      - chmod +x '{{.target_autobuild}}'
-    sources:
-      - Taskfile.yml
-    generates:
-      - '{{.target_autobuild}}'
     method: checksum
 
   build:dtask:
