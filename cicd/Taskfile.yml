@@ -1,0 +1,46 @@
+# https://taskfile.dev
+
+version: '2'
+output: 'group'
+output: prefixed
+
+vars:
+  GREETING: Hello, World!
+  DIMG: {sh: cat dimg.txt}
+
+_user_:
+  root_task: &_root_task
+    desc: _
+    dir: ..
+
+tasks:
+  default:
+    cmds:
+      - echo "{{.GREETING }}{{.DIMG}}"
+    silent: true
+
+  docker:build:envdimg:
+    desc: _
+    cmds:
+      - docker build -f test.Dockerfile -t '{{.DIMG}}' .
+
+  pytest: &_pytest
+    <<: *_root_task
+    cmds:
+      - PYVER='py{{.pyver}}' ./cicd/drun.sh python -u -m pytest
+
+  docker:run:test:
+    <<: *_root_task
+    deps:
+      - task: pytest
+        vars: {pyver: 2.7}
+      - task: pytest
+        vars: {pyver: 3.6}
+    cmds:
+      - echo passed in all
+
+  drun:tests:
+    <<: *_root_task
+    cmds:
+      - task -d cicd -p pytest pyver=3.6 pytest pyver=2.7
+      - echo passed in all

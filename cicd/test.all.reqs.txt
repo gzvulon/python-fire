@@ -1,0 +1,7 @@
+# repo.python-fire.all.reqs.txt
+
+pytest
+termcolor
+mock
+hypothesis
+python-Levenshtein
