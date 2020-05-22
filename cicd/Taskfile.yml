@@ -62,7 +62,7 @@ tasks:
       - echo passed in all
 
 
-  ci-build:
+  ci-flow:
     <<: *_root_task
     cmds:
       - task -d cicd/gzvulon__base_docker rebuild
