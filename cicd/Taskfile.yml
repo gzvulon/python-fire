@@ -27,6 +27,7 @@ tasks:
   pytest: &_pytest
     <<: *_root_task
     cmds:
+      - echo $(pwd)
       - PYVER='py{{.pyver}}' ./cicd/drun.sh python -u -m pytest
 
   docker:run:test:
