@@ -14,4 +14,4 @@ tasks:
   install:deps:
     desc: _
     cmds:
-      -
+      - PYVER=py2.7 ../generated/run

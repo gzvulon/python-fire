@@ -3,7 +3,6 @@
 FROM ubuntu:18.04
 
 # keep 4 lines
-USER $USER
 
 # --- @@[kind=dockerfile.part][name=install-miniconda][os=ubuntu][act=start]
 # install basics
